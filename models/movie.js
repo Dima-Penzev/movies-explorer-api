@@ -23,19 +23,30 @@ const movieSchema = new mongoose.Schema({
   },
   image: {
     type: String,
+    validate: {
+      validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
+      message: (props) => `${props.value} - невалидная ссылка!`,
+    },
     required: true,
   },
   trailerLink: {
     type: String,
+    validate: {
+      validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
+      message: (props) => `${props.value} - невалидная ссылка!`,
+    },
     required: true,
   },
   thumbnail: {
     type: String,
+    validate: {
+      validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
+      message: (props) => `${props.value} - невалидная ссылка!`,
+    },
     required: true,
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    type: String,
     required: true,
   },
   movieId: {

@@ -45,7 +45,7 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', {
         expiresIn: '7d',
       });
-      return res.status(HTTP_STATUS_OK).send({ token });
+      return res.status(HTTP_STATUS_OK).cookie('jwt', token, { maxAge: 3600000, httpOnly: true }).send({ data: email });
     })
     .catch(next);
 };
@@ -71,11 +71,11 @@ const getUserInfo = (req, res, next) => {
 
 const updateUserInfoById = (req, res, next) => {
   const userId = req.user._id;
-  const { name, about } = req.body;
+  const { email, name } = req.body;
 
   return User.findByIdAndUpdate(
     userId,
-    { name, about },
+    { email, name },
     { new: true, runValidators: true },
   )
     .then((user) => {
