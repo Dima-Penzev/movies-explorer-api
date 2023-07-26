@@ -58,7 +58,7 @@ const deleteMovieById = (req, res, next) => {
         throw new NotFoundError('Фильм по указанному id не найден.');
       }
       if (movie.owner !== userId) {
-        throw new ForbiddenError('Недостаточно прав для удаления данной карточки.');
+        throw new ForbiddenError('Недостаточно прав для удаления данного фильма.');
       }
       return Movie.findByIdAndRemove(movie._id.toHexString())
         .then((removedMovie) => res.status(HTTP_STATUS_OK).send({ data: removedMovie }));
