@@ -3,7 +3,7 @@ const { CastError, ValidationError } = require('mongoose').mongoose.Error;
 const Movie = require('../models/movie');
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
-// const ForbiddenError = require('../errors/forbiddenError');
+const ForbiddenError = require('../errors/forbiddenError');
 
 const getMovies = (req, res, next) => Movie.find({})
   .then((movies) => res.status(HTTP_STATUS_OK).send({ data: movies }))
@@ -49,15 +49,19 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovieById = (req, res, next) => {
-  // const userId = req.user._id;
+  const userId = req.user._id;
   const { movieId } = req.params;
 
-  return Movie.findByIdAndRemove(movieId)
+  return Movie.findById(movieId)
     .then((movie) => {
       if (!movie) {
         throw new NotFoundError('Фильм по указанному id не найден.');
       }
-      return res.status(HTTP_STATUS_OK).send({ data: movie });
+      if (movie.owner !== userId) {
+        throw new ForbiddenError('Недостаточно прав для удаления данной карточки.');
+      }
+      return Movie.findByIdAndRemove(movie._id.toHexString())
+        .then((removedMovie) => res.status(HTTP_STATUS_OK).send({ data: removedMovie }));
     })
     .catch((err) => {
       if (err instanceof CastError) {
