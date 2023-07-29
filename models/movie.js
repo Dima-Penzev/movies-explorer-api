@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { INVALID_LINK } = require('../constants/constants');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -25,7 +26,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
-      message: (props) => `${props.value} - невалидная ссылка!`,
+      message: (props) => `${props.value} - ${INVALID_LINK}`,
     },
     required: true,
   },
@@ -33,7 +34,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
-      message: (props) => `${props.value} - невалидная ссылка!`,
+      message: (props) => `${props.value} - ${INVALID_LINK}`,
     },
     required: true,
   },
@@ -41,12 +42,13 @@ const movieSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (v) => /http(s|\b):\/\/.+\.\w+.+/.test(v),
-      message: (props) => `${props.value} - невалидная ссылка!`,
+      message: (props) => `${props.value} - ${INVALID_LINK}`,
     },
     required: true,
   },
   owner: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   movieId: {

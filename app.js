@@ -1,16 +1,22 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const helmet = require('helmet');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const routes = require('./routes/index');
 const { handleErrors } = require('./utils/handleErrors');
+const limiter = require('./utils/limiter');
 
 const { NODE_ENV, PORT = 3000, DB_HOST } = process.env;
 
 const app = express();
+
+app.use(helmet());
+
+app.use(limiter);
 
 app.use(cookieParser());
 

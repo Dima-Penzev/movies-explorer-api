@@ -6,6 +6,9 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ConflictError = require('../errors/conflictError');
+const {
+  EXISTED_USER, INCORRECT_USER_DATA, NOT_FOUND_USER, INCORRECT_USER_ID, PROFILE_EXIT,
+} = require('../constants/constants');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -24,12 +27,10 @@ const createUser = (req, res, next) => {
     .then((newUser) => res.status(HTTP_STATUS_CREATED).send(newUser))
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует.'));
+        next(new ConflictError(EXISTED_USER));
       } else if (err instanceof ValidationError) {
         next(
-          new BadRequestError(
-            'Переданы некорректные данные при создании пользователя.',
-          ),
+          new BadRequestError(INCORRECT_USER_DATA),
         );
       } else {
         next(err);
@@ -56,13 +57,13 @@ const getUserInfo = (req, res, next) => {
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному id не найден.');
+        throw new NotFoundError(NOT_FOUND_USER);
       }
       return res.status(HTTP_STATUS_OK).send({ data: user });
     })
     .catch((err) => {
       if (err instanceof CastError) {
-        next(new BadRequestError('Передан некоректный id пользователя.'));
+        next(new BadRequestError(INCORRECT_USER_ID));
       } else {
         next(err);
       }
@@ -80,16 +81,14 @@ const updateUserInfoById = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному id не найден.');
+        throw new NotFoundError(NOT_FOUND_USER);
       }
       return res.status(HTTP_STATUS_OK).send({ data: user });
     })
     .catch((err) => {
       if (err instanceof ValidationError) {
         next(
-          new BadRequestError(
-            'Переданы некорректные данные при создании пользователя.',
-          ),
+          new BadRequestError(INCORRECT_USER_DATA),
         );
       } else {
         next(err);
@@ -99,7 +98,7 @@ const updateUserInfoById = (req, res, next) => {
 
 const logOut = async (req, res, next) => {
   try {
-    await res.status(HTTP_STATUS_OK).clearCookie('jwt').send({ massege: 'Вы вышли из своей учетной записи.' });
+    await res.status(HTTP_STATUS_OK).clearCookie('jwt').send({ massege: PROFILE_EXIT });
   } catch (err) {
     next(err);
   }
