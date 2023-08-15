@@ -39,7 +39,7 @@ app.use(
     origin:
       NODE_ENV === 'production'
         ? 'https://explorer-movies.nomoreparties.sbs'
-        : 'http://localhost:3000',
+        : 'localhost:3000',
     credentials: true,
   }),
 );
