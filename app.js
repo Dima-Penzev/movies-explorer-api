@@ -20,15 +20,29 @@ app.use(limiter);
 
 app.use(cookieParser());
 
-mongoose.connect(NODE_ENV === 'production' ? DB_HOST : 'mongodb://0.0.0.0:27017/bitfilmsdb', {
-  useNewUrlParser: true,
-}).then(() => {
-  console.log('База данных успешно подключена.');
-}).catch((err) => {
-  console.log(err.message);
-});
+mongoose
+  .connect(
+    NODE_ENV === 'production' ? DB_HOST : 'mongodb://0.0.0.0:27017/bitfilmsdb',
+    {
+      useNewUrlParser: true,
+    },
+  )
+  .then(() => {
+    console.log('База данных успешно подключена.');
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
 
-app.use(cors());
+app.use(
+  cors({
+    origin:
+      NODE_ENV === 'production'
+        ? 'https://explorer-movies.nomoreparties.sbs'
+        : 'http://localhost:3000',
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
