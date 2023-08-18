@@ -1,4 +1,4 @@
-const { Joi } = require('celebrate');
+const { Joi } = require("celebrate");
 
 const joiMovieSchema = {
   body: Joi.object().keys({
@@ -7,9 +7,11 @@ const joiMovieSchema = {
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().pattern(/http(s|\b):\/\/.+\.\w+.+/).required(),
-    trailerLink: Joi.string().pattern(/http(s|\b):\/\/.+\.\w+.+/).required(),
-    thumbnail: Joi.string().pattern(/http(s|\b):\/\/.+\.\w+.+/).required(),
+    image: Joi.string().required(),
+    trailerLink: Joi.string()
+      .pattern(/http(s|\b):\/\/.+\.\w+.+/)
+      .required(),
+    thumbnail: Joi.string().required(),
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
