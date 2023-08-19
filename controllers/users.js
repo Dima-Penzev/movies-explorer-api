@@ -1,37 +1,39 @@
-const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('node:http2').constants;
-const { CastError, ValidationError } = require('mongoose').mongoose.Error;
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const BadRequestError = require('../errors/badRequestError');
-const NotFoundError = require('../errors/notFoundError');
-const ConflictError = require('../errors/conflictError');
+const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require("node:http2").constants;
+const { CastError, ValidationError } = require("mongoose").mongoose.Error;
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const BadRequestError = require("../errors/badRequestError");
+const NotFoundError = require("../errors/notFoundError");
+const ConflictError = require("../errors/conflictError");
 const {
-  EXISTED_USER, INCORRECT_USER_DATA, NOT_FOUND_USER, INCORRECT_USER_ID, PROFILE_EXIT,
-} = require('../constants/constants');
+  EXISTED_USER,
+  INCORRECT_USER_DATA,
+  NOT_FOUND_USER,
+  INCORRECT_USER_ID,
+  PROFILE_EXIT,
+} = require("../constants/constants");
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const createUser = (req, res, next) => {
-  const {
-    email, password, name,
-  } = req.body;
+  const { email, password, name } = req.body;
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({
-      email,
-      password: hash,
-      name,
-    }))
+    .then((hash) =>
+      User.create({
+        email,
+        password: hash,
+        name,
+      })
+    )
     .then((newUser) => res.status(HTTP_STATUS_CREATED).send(newUser))
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError(EXISTED_USER));
       } else if (err instanceof ValidationError) {
-        next(
-          new BadRequestError(INCORRECT_USER_DATA),
-        );
+        next(new BadRequestError(INCORRECT_USER_DATA));
       } else {
         next(err);
       }
@@ -43,10 +45,17 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', {
-        expiresIn: '7d',
-      });
-      return res.status(HTTP_STATUS_OK).cookie('jwt', token, { maxAge: 3600000, httpOnly: true }).send({ data: email });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "secret-key",
+        {
+          expiresIn: "7d",
+        }
+      );
+      return res
+        .status(HTTP_STATUS_OK)
+        .cookie("jwt", token, { maxAge: 3600000, httpOnly: true })
+        .send({ data: user });
     })
     .catch(next);
 };
@@ -77,7 +86,7 @@ const updateUserInfoById = (req, res, next) => {
   return User.findByIdAndUpdate(
     userId,
     { email, name },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((user) => {
       if (!user) {
@@ -87,9 +96,7 @@ const updateUserInfoById = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof ValidationError) {
-        next(
-          new BadRequestError(INCORRECT_USER_DATA),
-        );
+        next(new BadRequestError(INCORRECT_USER_DATA));
       } else {
         next(err);
       }
@@ -98,7 +105,10 @@ const updateUserInfoById = (req, res, next) => {
 
 const logOut = async (req, res, next) => {
   try {
-    await res.status(HTTP_STATUS_OK).clearCookie('jwt').send({ massege: PROFILE_EXIT });
+    await res
+      .status(HTTP_STATUS_OK)
+      .clearCookie("jwt")
+      .send({ massege: PROFILE_EXIT });
   } catch (err) {
     next(err);
   }
