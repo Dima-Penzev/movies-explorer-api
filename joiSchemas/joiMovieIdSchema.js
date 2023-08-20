@@ -1,4 +1,4 @@
-const { Joi } = require("celebrate");
+const { Joi } = require('celebrate');
 
 const joiMovieIdSchema = {
   params: Joi.object().keys({

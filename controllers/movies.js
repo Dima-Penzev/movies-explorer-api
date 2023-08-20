@@ -1,21 +1,20 @@
-const { HTTP_STATUS_OK } = require("node:http2").constants;
-const { CastError, ValidationError } = require("mongoose").mongoose.Error;
-const Movie = require("../models/movie");
-const BadRequestError = require("../errors/badRequestError");
-const NotFoundError = require("../errors/notFoundError");
-const ForbiddenError = require("../errors/forbiddenError");
+const { HTTP_STATUS_OK } = require('node:http2').constants;
+const { CastError, ValidationError } = require('mongoose').mongoose.Error;
+const Movie = require('../models/movie');
+const BadRequestError = require('../errors/badRequestError');
+const NotFoundError = require('../errors/notFoundError');
+const ForbiddenError = require('../errors/forbiddenError');
 const {
   INCORRECT_MOVIE_DATA,
   NOT_FOUND_MOVIE,
   NOT_ENOUGH_RIGHTS,
   INCORRECT_REMOVAL_DATA,
-} = require("../constants/constants");
+} = require('../constants/constants');
 
-const getMovies = (req, res, next) =>
-  Movie.find({})
-    .populate(["owner"])
-    .then((movies) => res.status(HTTP_STATUS_OK).send({ data: movies }))
-    .catch(next);
+const getMovies = (req, res, next) => Movie.find({})
+  .populate(['owner'])
+  .then((movies) => res.status(HTTP_STATUS_OK).send({ data: movies }))
+  .catch(next);
 
 const createMovie = (req, res, next) => {
   const {
@@ -61,7 +60,7 @@ const deleteMovieById = (req, res, next) => {
   const { movieId } = req.params;
 
   return Movie.findOne({ movieId })
-    .populate(["owner"])
+    .populate(['owner'])
     .then((movie) => {
       if (!movie) {
         throw new NotFoundError(NOT_FOUND_MOVIE);
@@ -70,8 +69,7 @@ const deleteMovieById = (req, res, next) => {
         throw new ForbiddenError(NOT_ENOUGH_RIGHTS);
       }
       return Movie.findByIdAndRemove(movie._id.toString()).then(
-        (removedMovie) =>
-          res.status(HTTP_STATUS_OK).send({ data: removedMovie })
+        (removedMovie) => res.status(HTTP_STATUS_OK).send({ data: removedMovie }),
       );
     })
     .catch((err) => {

@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { INVALID_LINK } = require("../constants/constants");
+const mongoose = require('mongoose');
+const { INVALID_LINK } = require('../constants/constants');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -40,7 +40,7 @@ const movieSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: 'user',
     required: true,
   },
   movieId: {
@@ -57,4 +57,4 @@ const movieSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("movie", movieSchema);
+module.exports = mongoose.model('movie', movieSchema);
