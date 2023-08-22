@@ -59,7 +59,7 @@ const deleteMovieById = (req, res, next) => {
   const userId = req.user._id;
   const { movieId } = req.params;
 
-  return Movie.findOne({ movieId })
+  return Movie.findById(movieId)
     .populate(['owner'])
     .then((movie) => {
       if (!movie) {
