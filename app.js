@@ -36,8 +36,7 @@ mongoose
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    // origin: "https://explorer-movies.nomoreparties.sbs",
+    origin: 'https://explorer-movies.nomoreparties.sbs',
     credentials: true,
   }),
 );
