@@ -81,16 +81,21 @@ const updateUserInfoById = (req, res, next) => {
   const userId = req.user._id;
   const { email, name } = req.body;
 
-  return User.findByIdAndUpdate(
-    userId,
-    { email, name },
-    { new: true, runValidators: true },
-  )
+  return User.findOne({ email })
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError(NOT_FOUND_USER);
+      if (user) {
+        throw new ConflictError(EXISTED_USER);
       }
-      return res.status(HTTP_STATUS_OK).send({ data: user });
+      return User.findByIdAndUpdate(
+        userId,
+        { email, name },
+        { new: true, runValidators: true },
+      ).then((updataedUser) => {
+        if (!updataedUser) {
+          throw new NotFoundError(NOT_FOUND_USER);
+        }
+        return res.status(HTTP_STATUS_OK).send({ data: updataedUser });
+      });
     })
     .catch((err) => {
       if (err instanceof ValidationError) {
