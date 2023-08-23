@@ -1,18 +1,18 @@
-const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('node:http2').constants;
-const { CastError, ValidationError } = require('mongoose').mongoose.Error;
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const BadRequestError = require('../errors/badRequestError');
-const NotFoundError = require('../errors/notFoundError');
-const ConflictError = require('../errors/conflictError');
+const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require("node:http2").constants;
+const { CastError, ValidationError } = require("mongoose").mongoose.Error;
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const BadRequestError = require("../errors/badRequestError");
+const NotFoundError = require("../errors/notFoundError");
+const ConflictError = require("../errors/conflictError");
 const {
   EXISTED_USER,
   INCORRECT_USER_DATA,
   NOT_FOUND_USER,
   INCORRECT_USER_ID,
   PROFILE_EXIT,
-} = require('../constants/constants');
+} = require("../constants/constants");
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -21,11 +21,13 @@ const createUser = (req, res, next) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({
-      email,
-      password: hash,
-      name,
-    }))
+    .then((hash) =>
+      User.create({
+        email,
+        password: hash,
+        name,
+      })
+    )
     .then((newUser) => res.status(HTTP_STATUS_CREATED).send(newUser))
     .catch((err) => {
       if (err.code === 11000) {
@@ -45,14 +47,14 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+        NODE_ENV === "production" ? JWT_SECRET : "secret-key",
         {
-          expiresIn: '7d',
-        },
+          expiresIn: "7d",
+        }
       );
       return res
         .status(HTTP_STATUS_OK)
-        .cookie('jwt', token, { maxAge: 3600000, httpOnly: true })
+        .cookie("jwt", token, { maxAge: 3600000, httpOnly: true })
         .send({ data: user });
     })
     .catch(next);
@@ -83,13 +85,13 @@ const updateUserInfoById = (req, res, next) => {
 
   return User.findOne({ email })
     .then((user) => {
-      if (user) {
+      if (user && user._id.toString() !== userId) {
         throw new ConflictError(EXISTED_USER);
       }
       return User.findByIdAndUpdate(
         userId,
         { email, name },
-        { new: true, runValidators: true },
+        { new: true, runValidators: true }
       ).then((updataedUser) => {
         if (!updataedUser) {
           throw new NotFoundError(NOT_FOUND_USER);
@@ -110,7 +112,7 @@ const logOut = async (req, res, next) => {
   try {
     await res
       .status(HTTP_STATUS_OK)
-      .clearCookie('jwt')
+      .clearCookie("jwt")
       .send({ massege: PROFILE_EXIT });
   } catch (err) {
     next(err);
